@@ -8,13 +8,27 @@ namespace Netbiis.Spreadsheet
   public class Csv : Spreadsheet
   {
     /// <summary>
-    /// Generates the file.
+    /// Initializes a new instance of the <see cref="Csv"/> class.
+    /// </summary>
+    public Csv()
+    {
+      Separator = ',';
+    }
+
+    /// <summary>
+    /// Gets or sets the separator.
+    /// </summary>
+    /// <value>
+    /// The separator.
+    /// </value>
+    public char Separator { get; set; }
+
+    /// <summary>
+    ///   Generates the file.
     /// </summary>
     /// <returns></returns>
     public override byte[] GenerateFile()
     {
-      const char separator = ';';
-
       var values = new List<IEnumerable<string>>();
       values.Add(Header.Select(a => a.ToString()));
       values.AddRange(Body.Select(a => a.Select(b => b.ToString())));
@@ -23,9 +37,9 @@ namespace Netbiis.Spreadsheet
       foreach (var row in values)
       {
         fileContent = row.Aggregate(fileContent,
-          (current, column) => current + ("\"" + column?.Replace("\"", "\\\"") + "\"" + separator));
+          (current, column) => current + ("\"" + column?.Replace("\"", "\\\"") + "\"" + Separator));
 
-        fileContent = fileContent.Trim(separator);
+        fileContent = fileContent.Trim(Separator);
         fileContent += Environment.NewLine;
       }
 
