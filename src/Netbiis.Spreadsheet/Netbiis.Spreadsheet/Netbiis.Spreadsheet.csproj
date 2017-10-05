@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>0.0.1</Version>
-    <Authors>Dalton Ocura</Authors>
+    <Version>0.0.2</Version>
+    <Authors>Dalton Ocura, Alessandro Arantes</Authors>
     <Company>Netbiis</Company>
     <PackageLicenseUrl>https://raw.githubusercontent.com/netbiis-company/dotnet-spreadsheet/master/LICENSE.txt</PackageLicenseUrl>
     <Copyright>Netbiis © 2017</Copyright>
@@ -13,6 +13,7 @@
     <PackageTags>Spreadsheet Excel Csv</PackageTags>
     <PackageReleaseNotes>Generate Excel(xlsx) and CSV from a list of object or matrix of string.</PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageIconUrl>https://raw.githubusercontent.com/netbiis-company/dotnet-spreadsheet/master/assets/icon.png</PackageIconUrl>
   </PropertyGroup>
 
   <ItemGroup>
