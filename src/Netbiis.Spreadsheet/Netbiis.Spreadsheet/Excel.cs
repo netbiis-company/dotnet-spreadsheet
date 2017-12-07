@@ -8,6 +8,63 @@ namespace Netbiis.Spreadsheet
 {
   public class Excel : Spreadsheet
   {
+
+
+    private static Stylesheet CreateStylesheet()
+    {
+      Stylesheet ss = new Stylesheet();
+
+      Font font0 = new Font();         // Default font
+
+      Font font1 = new Font();         // Bold font
+      Color color1 = new Color();
+      color1.Rgb = "FFFFFFFF";
+      Bold bold = new Bold();
+      font1.Append(bold);
+      font1.Append(color1);
+
+      Fonts fonts = new Fonts();      // <APENDING Fonts>
+      fonts.Append(font0);
+      fonts.Append(font1);
+
+      // <Fills>
+      Fill fill0 = new Fill();        // Default fill
+
+      Fill fill1 = new Fill();        // Default fill
+      PatternFill patternFill3 = new PatternFill() { PatternType = PatternValues.Solid };
+      ForegroundColor foregroundColor1 = new ForegroundColor() { Rgb = new HexBinaryValue() { Value = "808080" }  };
+      BackgroundColor backgroundColor1 = new BackgroundColor() { Rgb = new HexBinaryValue() { Value = "808080" } };
+      patternFill3.Append(foregroundColor1);
+      patternFill3.Append(backgroundColor1);
+      fill1.Append(patternFill3);
+
+      Fills fills = new Fills();      // <APENDING Fills>
+      fills.Append(fill0);
+      fills.Append(fill1);
+
+      // <Borders>
+      Border border0 = new Border();     // Defualt border
+
+      Borders borders = new Borders();    // <APENDING Borders>
+      borders.Append(border0);
+
+      CellFormat cellformat0 = new CellFormat() { FontId = 0, FillId = 0, BorderId = 0 }; // Default style : Mandatory | Style ID =0
+
+      CellFormat cellformat1 = new CellFormat() { FontId = 1 , FillId = 1};
+      CellFormats cellformats = new CellFormats();
+      cellformats.Append(cellformat0);
+      cellformats.Append(cellformat1);
+
+
+      ss.Append(fonts);
+      ss.Append(fills);
+      ss.Append(borders);
+      ss.Append(cellformats);
+
+
+      return ss;
+    }
+
     /// <summary>
     ///   Generates the file.
     /// </summary>
@@ -18,10 +75,19 @@ namespace Netbiis.Spreadsheet
       values.Add(Header);
       values.AddRange(Body);
 
+
+
+
       var memory = new MemoryStream();
       using (var spreadsheetDocument = SpreadsheetDocument.Create(memory, SpreadsheetDocumentType.Workbook))
       {
         var workbookPart = spreadsheetDocument.AddWorkbookPart();
+
+
+        // Adding style
+        WorkbookStylesPart stylePart = workbookPart.AddNewPart<WorkbookStylesPart>();
+        stylePart.Stylesheet = CreateStylesheet();
+        stylePart.Stylesheet.Save();
 
         var sheetName = "Document";
         var worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
@@ -41,9 +107,15 @@ namespace Netbiis.Spreadsheet
         for (var i = 0; i < values.Count; i++)
         {
           var value = values[i];
-          var row = new Row {RowIndex = (uint) i + 1};
+          var row = new Row { RowIndex = (uint)i + 1 };
           foreach (var col in value)
-            row.AppendChild(ConvertObjectToCell(col));
+
+          {
+            var cell = ConvertObjectToCell(col);
+            cell.StyleIndex = 1;
+            row.AppendChild(cell);
+          }
+         
           sheetData.AppendChild(row);
         }
 
@@ -68,27 +140,36 @@ namespace Netbiis.Spreadsheet
     /// <returns></returns>
     private static Cell ConvertObjectToCell(object value)
     {
-      var objType = value.GetType();
       var cell = new Cell();
-      if (objType == typeof(decimal))
+
+      if (value == null)
       {
-        cell.DataType = CellValues.Number;
-        cell.CellValue = new CellValue(value.ToString());
-      }
-      else if (objType == typeof(int))
-      {
-        cell.DataType = CellValues.Number;
-        cell.CellValue = new CellValue(value.ToString());
+        cell.DataType = CellValues.String;
+        cell.CellValue = new CellValue(string.Empty);
       }
       else
       {
-        cell.DataType = CellValues.InlineString;
-        var inlineString = new InlineString();
-        var text = new Text {Text = value.ToString()};
-        inlineString.AppendChild(text);
-        cell.AppendChild(inlineString);
-      }
+        var objType = value.GetType();
 
+        if (objType == typeof(decimal))
+        {
+          cell.DataType = CellValues.Number;
+          cell.CellValue = new CellValue(value.ToString());
+        }
+        else if (objType == typeof(int))
+        {
+          cell.DataType = CellValues.Number;
+          cell.CellValue = new CellValue(value.ToString());
+        }
+        else
+        {
+          cell.DataType = CellValues.InlineString;
+          var inlineString = new InlineString();
+          var text = new Text { Text = value.ToString() };
+          inlineString.AppendChild(text);
+          cell.AppendChild(inlineString);
+        }
+      }
       return cell;
     }
   }
