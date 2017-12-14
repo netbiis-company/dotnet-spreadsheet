@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,12 +11,12 @@ namespace Netbiis.Spreadsheet
   public class Excel : Spreadsheet
   {
     /// <summary>
-    /// The row stylesheet
+    ///   The row stylesheet
     /// </summary>
     private readonly List<KeyValuePair<int, uint?>> _rowStylesheet;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Excel"/> class.
+    ///   Initializes a new instance of the <see cref="Excel" /> class.
     /// </summary>
     public Excel()
     {
@@ -23,15 +24,15 @@ namespace Netbiis.Spreadsheet
     }
 
     /// <summary>
-    /// Gets or sets the stylesheet.
+    ///   Gets or sets the stylesheet.
     /// </summary>
     /// <value>
-    /// The stylesheet.
+    ///   The stylesheet.
     /// </value>
     public Stylesheet Stylesheet { get; set; }
 
     /// <summary>
-    /// Sets the stylesheet.
+    ///   Sets the stylesheet.
     /// </summary>
     /// <param name="row">The row.</param>
     /// <param name="styleIndex">Index of the style.</param>
@@ -55,10 +56,13 @@ namespace Netbiis.Spreadsheet
       {
         var workbookPart = spreadsheetDocument.AddWorkbookPart();
 
-        // Adding style
-        var stylePart = workbookPart.AddNewPart<WorkbookStylesPart>();
-        stylePart.Stylesheet = Stylesheet;
-        stylePart.Stylesheet.Save();
+        if (Stylesheet != null)
+        {
+          // Adding style
+          var stylePart = workbookPart.AddNewPart<WorkbookStylesPart>();
+          stylePart.Stylesheet = Stylesheet;
+          stylePart.Stylesheet.Save();
+        }
 
         var sheetName = "Document";
         var worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
@@ -111,29 +115,71 @@ namespace Netbiis.Spreadsheet
     /// <returns></returns>
     private static Cell ConvertObjectToCell(object value)
     {
-      var objType = value == null ? typeof(string) : value.GetType();
-
       var cell = new Cell();
-      if (objType == typeof(decimal))
+      if (value == null)
       {
-        cell.DataType = CellValues.Number;
-        cell.CellValue = new CellValue(value?.ToString() ?? "");
+        cell.DataType = CellValues.String;
+        var cellValue = new CellValue("");
+        cell.AppendChild(cellValue);
+        return cell;
       }
-      else if (objType == typeof(int))
+
+      var objType = value.GetType();
+
+      if (objType == typeof(ExcelCell))
+        return ConvertExcelCellToCell((ExcelCell) value);
+
+      if (objType == typeof(decimal) || objType == typeof(int))
       {
         cell.DataType = CellValues.Number;
-        cell.CellValue = new CellValue(value?.ToString() ?? "");
+        cell.CellValue = new CellValue(value.ToString());
       }
       else
       {
-        cell.DataType = CellValues.InlineString;
-        var inlineString = new InlineString();
-        var text = new Text {Text = value?.ToString() ?? ""};
-        inlineString.AppendChild(text);
-        cell.AppendChild(inlineString);
+        cell.DataType = CellValues.String;
+        var cellValue = new CellValue(value.ToString() ?? "");
+        cell.AppendChild(cellValue);
       }
 
       return cell;
+    }
+
+    /// <summary>
+    ///   Converts the excel cell to cell.
+    /// </summary>
+    /// <param name="value">The value.</param>
+    /// <returns></returns>
+    private static Cell ConvertExcelCellToCell(ExcelCell value)
+    {
+      var valueType = value.TypeId;
+
+      switch (valueType)
+      {
+        case ExcelCell.Type.Hyperlink:
+          var convValue = (string[]) value.Value;
+          var cell = new Cell();
+          cell.DataType = CellValues.String;
+          var cellformula = new CellFormula();
+          cellformula.Text = "HYPERLINK(\"" + convValue[1] + "\", \"" + convValue[0] + "\")";
+          var cellValue = new CellValue(convValue[0]);
+          cell.AppendChild(cellformula);
+          cell.AppendChild(cellValue);
+          return cell;
+        default:
+          return ConvertObjectToCell(value.Value);
+      }
+    }
+
+    /// <summary>
+    ///   Sets the data by ExcelCell.
+    /// </summary>
+    /// <param name="header">The header.</param>
+    /// <param name="body">The body.</param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public void SetDataByExcelCell(IEnumerable<string> header, IEnumerable<IEnumerable<ExcelCell>> body)
+    {
+      Header = header;
+      Body = body;
     }
   }
 }

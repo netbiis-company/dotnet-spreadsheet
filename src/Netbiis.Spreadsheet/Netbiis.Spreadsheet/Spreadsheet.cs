@@ -12,7 +12,7 @@ namespace Netbiis.Spreadsheet
     /// <value>
     /// The header.
     /// </value>
-    public IEnumerable<object> Header { get; private set; }
+    public IEnumerable<object> Header { get; protected set; }
 
     /// <summary>
     /// Gets the body.
@@ -20,7 +20,7 @@ namespace Netbiis.Spreadsheet
     /// <value>
     /// The body.
     /// </value>
-    public IEnumerable<IEnumerable<object>> Body { get; private set; }
+    public IEnumerable<IEnumerable<object>> Body { get; protected set; }
 
     /// <summary>
     /// Sets the data.

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>0.0.2.1-alpha</Version>
+    <Version>0.0.3</Version>
     <Authors>Dalton Ocura, Alessandro Arantes</Authors>
     <Company>Netbiis</Company>
     <PackageLicenseUrl>https://raw.githubusercontent.com/netbiis-company/dotnet-spreadsheet/master/LICENSE.txt</PackageLicenseUrl>
@@ -11,11 +11,11 @@
     <RepositoryUrl>https://github.com/netbiis-company/dotnet-spreadsheet.git</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <PackageTags>Spreadsheet Excel Csv</PackageTags>
-    <PackageReleaseNotes>Bugfix ConvertObjectToCell avoid null error</PackageReleaseNotes>
+    <PackageReleaseNotes>Added option to add Stylesheet and hyperlink to Excel</PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageIconUrl>https://raw.githubusercontent.com/netbiis-company/dotnet-spreadsheet/master/assets/icon.png</PackageIconUrl>
-    <AssemblyVersion>0.0.2.1</AssemblyVersion>
-    <FileVersion>0.0.2.1</FileVersion>
+    <AssemblyVersion>0.0.3.0</AssemblyVersion>
+    <FileVersion>0.0.3.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
