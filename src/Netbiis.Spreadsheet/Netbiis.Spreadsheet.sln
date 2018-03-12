@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Netbiis.Spreadsheet", "Netbiis.Spreadsheet\Netbiis.Spreadsheet.csproj", "{EFF1914D-EBAB-40ED-BACB-5D79D554B77F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Netbiis.SpreadsheetTest", "Netbiis.SpreadsheetTest\Netbiis.SpreadsheetTest.csproj", "{F6EAA731-F9D7-4601-8AED-2706CFFF3A33}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Netbiis.SpreadsheetTest", "Netbiis.SpreadsheetTest\Netbiis.SpreadsheetTest.csproj", "{F6EAA731-F9D7-4601-8AED-2706CFFF3A33}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

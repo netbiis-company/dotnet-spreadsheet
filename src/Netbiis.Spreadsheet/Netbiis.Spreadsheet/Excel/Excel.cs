@@ -1,10 +1,16 @@
+// ReSharper disable CheckNamespace
+
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
+using AutoMapper;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using Ocura.Helper;
 
 namespace Netbiis.Spreadsheet
 {
@@ -32,13 +38,65 @@ namespace Netbiis.Spreadsheet
     public Stylesheet Stylesheet { get; set; }
 
     /// <summary>
-    ///   Sets the stylesheet.
+    ///   Converts the excel cell to cell.
     /// </summary>
-    /// <param name="row">The row.</param>
-    /// <param name="styleIndex">Index of the style.</param>
-    public void SetStylesheet(int row, uint styleIndex)
+    /// <param name="value">The value.</param>
+    /// <returns></returns>
+    private static Cell ConvertExcelCellToCell(ExcelCell value)
     {
-      _rowStylesheet.Add(new KeyValuePair<int, uint?>(row, styleIndex));
+      var valueType = value.TypeId;
+
+      switch (valueType)
+      {
+        case ExcelCell.Type.Hyperlink:
+          var convValue = (string[]) value.Value;
+          var cell = new Cell();
+          cell.DataType = CellValues.String;
+          var cellformula = new CellFormula();
+          cellformula.Text = "HYPERLINK(\"" + convValue[1] + "\", \"" + convValue[0] + "\")";
+          var cellValue = new CellValue(convValue[0]);
+          cell.AppendChild(cellformula);
+          cell.AppendChild(cellValue);
+          return cell;
+        default:
+          return ConvertObjectToCell(value.Value);
+      }
+    }
+
+    /// <summary>
+    ///   Converts the object to cell.
+    /// </summary>
+    /// <param name="value">The value.</param>
+    /// <returns></returns>
+    private static Cell ConvertObjectToCell(object value)
+    {
+      var cell = new Cell();
+      if (value == null)
+      {
+        cell.DataType = CellValues.String;
+        var cellValue = new CellValue("");
+        cell.AppendChild(cellValue);
+        return cell;
+      }
+
+      var objType = value.GetType();
+
+      if (objType == typeof(ExcelCell))
+        return ConvertExcelCellToCell((ExcelCell) value);
+
+      if (objType == typeof(decimal) || objType == typeof(int))
+      {
+        cell.DataType = CellValues.Number;
+        cell.CellValue = new CellValue(value.ToString());
+      }
+      else
+      {
+        cell.DataType = CellValues.String;
+        var cellValue = new CellValue(value.ToString() ?? "");
+        cell.AppendChild(cellValue);
+      }
+
+      return cell;
     }
 
     /// <summary>
@@ -108,65 +166,83 @@ namespace Netbiis.Spreadsheet
       return file;
     }
 
-    /// <summary>
-    ///   Converts the object to cell.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns></returns>
-    private static Cell ConvertObjectToCell(object value)
+    private string GetExcelColumnName(int columnNumber)
     {
-      var cell = new Cell();
-      if (value == null)
+      var dividend = columnNumber;
+      var columnName = string.Empty;
+
+      while (dividend > 0)
       {
-        cell.DataType = CellValues.String;
-        var cellValue = new CellValue("");
-        cell.AppendChild(cellValue);
-        return cell;
+        var mod = (dividend - 1) % 26;
+        columnName = Convert.ToChar(65 + mod) + columnName;
+        dividend = (dividend - mod) / 26;
       }
 
-      var objType = value.GetType();
-
-      if (objType == typeof(ExcelCell))
-        return ConvertExcelCellToCell((ExcelCell) value);
-
-      if (objType == typeof(decimal) || objType == typeof(int))
-      {
-        cell.DataType = CellValues.Number;
-        cell.CellValue = new CellValue(value.ToString());
-      }
-      else
-      {
-        cell.DataType = CellValues.String;
-        var cellValue = new CellValue(value.ToString() ?? "");
-        cell.AppendChild(cellValue);
-      }
-
-      return cell;
+      return columnName;
     }
 
-    /// <summary>
-    ///   Converts the excel cell to cell.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns></returns>
-    private static Cell ConvertExcelCellToCell(ExcelCell value)
+    public IEnumerable<T> ReadFile<T>(FileStream excelFile, ExcelMapper<T> excelMapper, bool hasTitle) where T : class
     {
-      var valueType = value.TypeId;
-
-      switch (valueType)
+      using (var doc = SpreadsheetDocument.Open(excelFile, false))
       {
-        case ExcelCell.Type.Hyperlink:
-          var convValue = (string[]) value.Value;
-          var cell = new Cell();
-          cell.DataType = CellValues.String;
-          var cellformula = new CellFormula();
-          cellformula.Text = "HYPERLINK(\"" + convValue[1] + "\", \"" + convValue[0] + "\")";
-          var cellValue = new CellValue(convValue[0]);
-          cell.AppendChild(cellformula);
-          cell.AppendChild(cellValue);
-          return cell;
-        default:
-          return ConvertObjectToCell(value.Value);
+        var config = new MapperConfiguration(cfg => cfg.CreateMap<List<dynamic>, IEnumerable<T>>());
+        var mapper = config.CreateMapper();
+
+        var workbookPart = doc.WorkbookPart;
+        var sstpart = workbookPart.GetPartsOfType<SharedStringTablePart>().First();
+        var sst = sstpart.SharedStringTable;
+
+        var worksheetPart = workbookPart.WorksheetParts.First();
+        var sheet = worksheetPart.Worksheet;
+
+        var rows = sheet.Descendants<Row>();
+
+        var retObject = new List<ExpandoObject>();
+        var rowsArray = rows.ToArray();
+
+        for (var r = hasTitle ? 1 : 0; r < rowsArray.Length; r++)
+        {
+          var row = rowsArray[r];
+          var cs = row.Elements<Cell>().ToArray();
+          var dataRow = new ExpandoObject() as IDictionary<string, object>;
+          for (var j = 0; j < cs.Length; j++)
+          {
+            var c = cs[j];
+            object stgValue;
+
+            var cellReferenceLetter = new Regex("[A-Za-z]+").Match(c.CellReference).Value;
+            var excelMap = excelMapper.Items.First(a => a.ReferenceLetter == cellReferenceLetter);
+            
+            if (c.DataType != null && c.DataType == CellValues.SharedString)
+            {
+              var ssid = int.Parse(c.CellValue.Text);
+              var str = sst.ChildElements[ssid].InnerText;
+              stgValue = str;
+            }
+            else
+            {
+              stgValue = c.CellValue.Text;
+            }
+
+            object convertedValue;
+
+            if (excelMap.Type == typeof(double))
+              convertedValue = Convert.ToDouble(stgValue);
+            else if (excelMap.Type == typeof(int))
+              convertedValue = Convert.ToInt32(stgValue);
+            else
+              convertedValue = stgValue;
+
+            var dataField = (IDictionary<string, object>) DynamicObjectHelper
+              .GenerateNestedObject(excelMap.Name ?? excelMap.ReferenceLetter, convertedValue);
+
+            dataRow = DynamicObjectHelper
+              .AddIDictionary((ExpandoObject) dataRow, (ExpandoObject) dataField);
+          }
+          retObject.Add((ExpandoObject) dataRow);
+        }
+
+        return retObject.Select(c => mapper.Map<T>(c));
       }
     }
 
@@ -180,6 +256,16 @@ namespace Netbiis.Spreadsheet
     {
       Header = header;
       Body = body;
+    }
+
+    /// <summary>
+    ///   Sets the stylesheet.
+    /// </summary>
+    /// <param name="row">The row.</param>
+    /// <param name="styleIndex">Index of the style.</param>
+    public void SetStylesheet(int row, uint styleIndex)
+    {
+      _rowStylesheet.Add(new KeyValuePair<int, uint?>(row, styleIndex));
     }
   }
 }

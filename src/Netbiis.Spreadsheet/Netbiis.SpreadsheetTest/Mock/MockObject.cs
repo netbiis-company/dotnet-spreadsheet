@@ -36,17 +36,17 @@ namespace Netbiis.SpreadsheetTest.Mock
       ExcelCellItems = excelCellItems;
     }
 
-    public IEnumerable<Item> Items { get; }
-
     public IEnumerable<IEnumerable<ExcelCell>> ExcelCellItems { get; }
+
+    public IEnumerable<Item> Items { get; }
 
     public class Item
     {
+      public bool CheckBoolean { get; set; }
+      public string Description { get; set; }
       public int Id { get; set; }
       public string Name { get; set; }
-      public string Description { get; set; }
       public decimal Value { get; set; }
-      public bool CheckBoolean { get; set; }
     }
   }
 }

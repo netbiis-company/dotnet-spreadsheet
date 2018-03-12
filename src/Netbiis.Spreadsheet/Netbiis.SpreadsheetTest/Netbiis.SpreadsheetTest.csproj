@@ -16,4 +16,8 @@
     <ProjectReference Include="..\Netbiis.Spreadsheet\Netbiis.Spreadsheet.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Files\" />
+  </ItemGroup>
+
 </Project>

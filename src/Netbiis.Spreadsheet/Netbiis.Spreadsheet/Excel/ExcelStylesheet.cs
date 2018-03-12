@@ -1,6 +1,8 @@
+// ReSharper disable PossiblyMistakenUseOfParamsMethod
+// ReSharper disable CheckNamespace
+
 using DocumentFormat.OpenXml.Spreadsheet;
 
-// ReSharper disable once CheckNamespace
 namespace Netbiis.Spreadsheet
 {
   public static class ExcelStylesheet
@@ -9,8 +11,6 @@ namespace Netbiis.Spreadsheet
 
     private static Stylesheet SetDefault()
     {
-      Stylesheet styleSheet = null;
-
       //Fonts
       var fonts = new Fonts();
 

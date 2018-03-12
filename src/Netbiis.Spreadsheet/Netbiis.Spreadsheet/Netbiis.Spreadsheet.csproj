@@ -2,25 +2,27 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>0.0.3</Version>
-    <Authors>Dalton Ocura, Alessandro Arantes</Authors>
+    <Version>0.1.2</Version>
+    <Authors>Dalton Ocura</Authors>
     <Company>Netbiis</Company>
-    <PackageLicenseUrl>https://raw.githubusercontent.com/netbiis-company/dotnet-spreadsheet/master/LICENSE.txt</PackageLicenseUrl>
-    <Copyright>Netbiis © 2017</Copyright>
-    <PackageProjectUrl>https://github.com/netbiis-company/dotnet-spreadsheet</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/netbiis-company/dotnet-spreadsheet.git</RepositoryUrl>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/netbiis/dotnet-spreadsheet/master/LICENSE.txt</PackageLicenseUrl>
+    <Copyright>Netbiis © 2018</Copyright>
+    <PackageProjectUrl>https://github.com/netbiis/dotnet-spreadsheet</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/netbiis/dotnet-spreadsheet.git</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <PackageTags>Spreadsheet Excel Csv</PackageTags>
-    <PackageReleaseNotes>Added option to add Stylesheet and hyperlink to Excel</PackageReleaseNotes>
+    <PackageReleaseNotes></PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageIconUrl>https://raw.githubusercontent.com/netbiis-company/dotnet-spreadsheet/master/assets/icon.png</PackageIconUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/netbiis/dotnet-spreadsheet/master/assets/icon.png</PackageIconUrl>
     <AssemblyVersion>0.0.3.0</AssemblyVersion>
     <FileVersion>0.0.3.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="5.1.1" />
     <PackageReference Include="DocumentFormat.OpenXml" Version="2.7.2" />
-    <PackageReference Include="Ocura.Helper" Version="0.0.2" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.4.1" />
+    <PackageReference Include="Ocura.Helper" Version="0.1.1" />
   </ItemGroup>
 
 </Project>

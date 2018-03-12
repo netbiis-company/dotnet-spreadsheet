@@ -58,5 +58,37 @@ namespace Netbiis.SpreadsheetTest
       var file = spreadsheet.GenerateFile();
       File.WriteAllBytes(_applicationPath + @"\GenerateExcelFromObjectListWithStylesheet.xlsx", file);
     }
+
+    [Fact]
+    public void SpreadsheetReadFile()
+    {
+      var excelMapper = new ExcelMapper<HotelProvider>();
+      excelMapper.Add("A", "HotelKey", typeof(string));
+      excelMapper.Add("B", "HotelName", typeof(string));
+      excelMapper.Add("C", null, typeof(string));
+      excelMapper.Add("D", "LocationType", typeof(string));
+      excelMapper.Add("E", "Address_1", typeof(string));
+      excelMapper.Add("F", "Address_2", typeof(string));
+      excelMapper.Add("G", "Address_3", typeof(string));
+      excelMapper.Add("H", "Address_4", typeof(string));
+      excelMapper.Add("I", "Phone", typeof(string));
+      excelMapper.Add("J", "Fax", typeof(string));
+      excelMapper.Add("K", "Email", typeof(string));
+      excelMapper.Add("L", "Website", typeof(string));
+      excelMapper.Add("M", "StarRating", typeof(int));
+      excelMapper.Add("N", "Category", typeof(string));
+      excelMapper.Add("O", "Latitude", typeof(double));
+      excelMapper.Add("P", "Longitude", typeof(double));
+      excelMapper.Add("Q", "CityCode", typeof(string));
+      excelMapper.Add("R", "CityName", typeof(string));
+      excelMapper.Add("S", "CountryCode", typeof(string));
+      excelMapper.Add("T", null, typeof(string));
+      excelMapper.Add("U", "CountryName", typeof(string));
+      
+      var fileName = @"E:\Source\Netbiis-Git\dotnet-spreadsheet\src\Netbiis.Spreadsheet\Netbiis.SpreadsheetTest\Files\HotelProvider.xlsx";
+      var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+      var spreadsheet = new Excel();
+      var hotelProvider = spreadsheet.ReadFile(fileStream, excelMapper, true);
+    }
   }
 }

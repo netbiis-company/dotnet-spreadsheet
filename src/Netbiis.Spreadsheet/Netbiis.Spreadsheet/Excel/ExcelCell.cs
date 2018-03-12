@@ -1,4 +1,4 @@
-// ReSharper disable once CheckNamespace
+// ReSharper disable CheckNamespace
 
 namespace Netbiis.Spreadsheet
 {
@@ -33,19 +33,19 @@ namespace Netbiis.Spreadsheet
     }
 
     /// <summary>
-    ///   Gets or sets the value.
-    /// </summary>
-    /// <value>
-    ///   The value.
-    /// </value>
-    public object Value { get; set; }
-
-    /// <summary>
     ///   Gets or sets the type identifier.
     /// </summary>
     /// <value>
     ///   The type identifier.
     /// </value>
     public Type TypeId { get; set; }
+
+    /// <summary>
+    ///   Gets or sets the value.
+    /// </summary>
+    /// <value>
+    ///   The value.
+    /// </value>
+    public object Value { get; set; }
   }
 }

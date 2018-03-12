@@ -1,15 +1,16 @@
+// ReSharper disable CheckNamespace
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-// ReSharper disable once CheckNamespace
 namespace Netbiis.Spreadsheet
 {
   public class Csv : Spreadsheet
   {
     /// <summary>
-    /// Initializes a new instance of the <see cref="Csv"/> class.
+    ///   Initializes a new instance of the <see cref="Csv" /> class.
     /// </summary>
     public Csv()
     {
@@ -17,10 +18,10 @@ namespace Netbiis.Spreadsheet
     }
 
     /// <summary>
-    /// Gets or sets the separator.
+    ///   Gets or sets the separator.
     /// </summary>
     /// <value>
-    /// The separator.
+    ///   The separator.
     /// </value>
     public char Separator { get; set; }
 
