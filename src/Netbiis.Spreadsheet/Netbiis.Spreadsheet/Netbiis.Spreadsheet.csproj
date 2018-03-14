@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>0.1.2</Version>
+    <Version>0.2.0</Version>
     <Authors>Dalton Ocura</Authors>
     <Company>Netbiis</Company>
     <PackageLicenseUrl>https://raw.githubusercontent.com/netbiis/dotnet-spreadsheet/master/LICENSE.txt</PackageLicenseUrl>
@@ -14,8 +14,8 @@
     <PackageReleaseNotes></PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageIconUrl>https://raw.githubusercontent.com/netbiis/dotnet-spreadsheet/master/assets/icon.png</PackageIconUrl>
-    <AssemblyVersion>0.0.3.0</AssemblyVersion>
-    <FileVersion>0.0.3.0</FileVersion>
+    <AssemblyVersion>0.0.0.0</AssemblyVersion>
+    <FileVersion>0.0.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

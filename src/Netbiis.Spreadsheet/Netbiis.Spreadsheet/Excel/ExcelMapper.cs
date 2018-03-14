@@ -5,8 +5,15 @@ using System.Collections.Generic;
 
 namespace Netbiis.Spreadsheet
 {
-  public class ExcelMapper<T>
+  public class ExcelMapper
   {
+    public enum Type
+    {
+      String,
+      Int,
+      Double
+    }
+
     public ExcelMapper()
     {
       Items = new List<Item>();
@@ -14,20 +21,41 @@ namespace Netbiis.Spreadsheet
 
     public List<Item> Items { get; set; }
 
-    public void Add(string referenceLetter, string name, Type type)
+    public void Add(string from, string to, string type)
     {
-      Items.Add(new Item
+      var item = new Item
       {
-        ReferenceLetter = referenceLetter,
-        Name = name,
+        From = from,
+        To = to
+      };
+
+      if (string.Equals(type, Type.String.ToString(), StringComparison.CurrentCultureIgnoreCase))
+        item.Type = Type.String;
+      else if (string.Equals(type, Type.Int.ToString(), StringComparison.CurrentCultureIgnoreCase))
+        item.Type = Type.Int;
+      else if (string.Equals(type, Type.Double.ToString(), StringComparison.CurrentCultureIgnoreCase))
+        item.Type = Type.Double;
+      else
+        throw new ArgumentOutOfRangeException(nameof(type), type, null);
+
+      Items.Add(item);
+    }
+
+    public void Add(string from, string to, Type type)
+    {
+      var item = new Item
+      {
+        From = from,
+        To = to,
         Type = type
-      });
+      };
+      Items.Add(item);
     }
 
     public class Item
     {
-      public string Name { get; set; }
-      public string ReferenceLetter { get; set; }
+      public string From { get; set; }
+      public string To { get; set; }
       public Type Type { get; set; }
     }
   }

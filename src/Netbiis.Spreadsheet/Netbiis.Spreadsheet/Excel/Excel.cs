@@ -166,22 +166,15 @@ namespace Netbiis.Spreadsheet
       return file;
     }
 
-    private string GetExcelColumnName(int columnNumber)
-    {
-      var dividend = columnNumber;
-      var columnName = string.Empty;
-
-      while (dividend > 0)
-      {
-        var mod = (dividend - 1) % 26;
-        columnName = Convert.ToChar(65 + mod) + columnName;
-        dividend = (dividend - mod) / 26;
-      }
-
-      return columnName;
-    }
-
-    public IEnumerable<T> ReadFile<T>(FileStream excelFile, ExcelMapper<T> excelMapper, bool hasTitle) where T : class
+    /// <summary>
+    ///   Reads the file.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="excelFile">The excel file.</param>
+    /// <param name="excelMapper">The excel mapper.</param>
+    /// <param name="hasTitle">if set to <c>true</c> [has title].</param>
+    /// <returns></returns>
+    public IEnumerable<T> ReadFile<T>(FileStream excelFile, ExcelMapper excelMapper, bool hasTitle) where T : class
     {
       using (var doc = SpreadsheetDocument.Open(excelFile, false))
       {
@@ -211,8 +204,10 @@ namespace Netbiis.Spreadsheet
             object stgValue;
 
             var cellReferenceLetter = new Regex("[A-Za-z]+").Match(c.CellReference).Value;
-            var excelMap = excelMapper.Items.First(a => a.ReferenceLetter == cellReferenceLetter);
-            
+            var excelMap = excelMapper.Items.FirstOrDefault(a => a.From == cellReferenceLetter);
+
+            if (excelMap == null) continue;
+
             if (c.DataType != null && c.DataType == CellValues.SharedString)
             {
               var ssid = int.Parse(c.CellValue.Text);
@@ -226,15 +221,24 @@ namespace Netbiis.Spreadsheet
 
             object convertedValue;
 
-            if (excelMap.Type == typeof(double))
-              convertedValue = Convert.ToDouble(stgValue);
-            else if (excelMap.Type == typeof(int))
-              convertedValue = Convert.ToInt32(stgValue);
-            else
-              convertedValue = stgValue;
+            switch (excelMap.Type)
+            {
+              case ExcelMapper.Type.Double:
+                convertedValue = Convert.ToDouble(stgValue);
+                break;
+              case ExcelMapper.Type.Int:
+                convertedValue = Convert.ToInt32(stgValue);
+                break;
+              case ExcelMapper.Type.String:
+                convertedValue = stgValue;
+                break;
+              default:
+                convertedValue = stgValue;
+                break;
+            }
 
             var dataField = (IDictionary<string, object>) DynamicObjectHelper
-              .GenerateNestedObject(excelMap.Name ?? excelMap.ReferenceLetter, convertedValue);
+              .GenerateNestedObject(excelMap.To ?? excelMap.From, convertedValue);
 
             dataRow = DynamicObjectHelper
               .AddIDictionary((ExpandoObject) dataRow, (ExpandoObject) dataField);

@@ -62,33 +62,35 @@ namespace Netbiis.SpreadsheetTest
     [Fact]
     public void SpreadsheetReadFile()
     {
-      var excelMapper = new ExcelMapper<HotelProvider>();
-      excelMapper.Add("A", "HotelKey", typeof(string));
-      excelMapper.Add("B", "HotelName", typeof(string));
-      excelMapper.Add("C", null, typeof(string));
-      excelMapper.Add("D", "LocationType", typeof(string));
-      excelMapper.Add("E", "Address_1", typeof(string));
-      excelMapper.Add("F", "Address_2", typeof(string));
-      excelMapper.Add("G", "Address_3", typeof(string));
-      excelMapper.Add("H", "Address_4", typeof(string));
-      excelMapper.Add("I", "Phone", typeof(string));
-      excelMapper.Add("J", "Fax", typeof(string));
-      excelMapper.Add("K", "Email", typeof(string));
-      excelMapper.Add("L", "Website", typeof(string));
-      excelMapper.Add("M", "StarRating", typeof(int));
-      excelMapper.Add("N", "Category", typeof(string));
-      excelMapper.Add("O", "Latitude", typeof(double));
-      excelMapper.Add("P", "Longitude", typeof(double));
-      excelMapper.Add("Q", "CityCode", typeof(string));
-      excelMapper.Add("R", "CityName", typeof(string));
-      excelMapper.Add("S", "CountryCode", typeof(string));
-      excelMapper.Add("T", null, typeof(string));
-      excelMapper.Add("U", "CountryName", typeof(string));
+      var excelMapper = new ExcelMapper();
+      excelMapper.Add("A", "HotelKey", ExcelMapper.Type.String);
+      excelMapper.Add("B", "HotelName", ExcelMapper.Type.String);
+      excelMapper.Add("C", null, ExcelMapper.Type.String);
+      excelMapper.Add("D", "LocationType", ExcelMapper.Type.String);
+      excelMapper.Add("E", "Address_1", ExcelMapper.Type.String);
+      excelMapper.Add("F", "Address_2", ExcelMapper.Type.String);
+      excelMapper.Add("G", "Address_3", ExcelMapper.Type.String);
+      excelMapper.Add("H", "Address_4", ExcelMapper.Type.String);
+      excelMapper.Add("I", "Phone", ExcelMapper.Type.String);
+      excelMapper.Add("J", "Fax", ExcelMapper.Type.String);
+      excelMapper.Add("K", "Email", ExcelMapper.Type.String);
+      excelMapper.Add("L", "Website", ExcelMapper.Type.String);
+      excelMapper.Add("M", "StarRating",ExcelMapper.Type.Int);
+      excelMapper.Add("N", "Category", ExcelMapper.Type.String);
+      excelMapper.Add("O", "Latitude", ExcelMapper.Type.Double);
+      excelMapper.Add("P", "Longitude", ExcelMapper.Type.Double);
+      excelMapper.Add("Q", "CityCode", ExcelMapper.Type.String);
+      excelMapper.Add("R", "CityName", ExcelMapper.Type.String);
+      excelMapper.Add("S", "CountryCode", ExcelMapper.Type.String);
+      excelMapper.Add("T", null, ExcelMapper.Type.String);
+      excelMapper.Add("U", "CountryName", ExcelMapper.Type.String);
+
+      var a = Newtonsoft.Json.JsonConvert.SerializeObject(excelMapper);
       
       var fileName = @"E:\Source\Netbiis-Git\dotnet-spreadsheet\src\Netbiis.Spreadsheet\Netbiis.SpreadsheetTest\Files\HotelProvider.xlsx";
       var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
       var spreadsheet = new Excel();
-      var hotelProvider = spreadsheet.ReadFile(fileStream, excelMapper, true);
+      var hotelProvider = spreadsheet.ReadFile<HotelProvider>(fileStream, excelMapper, true);
     }
   }
 }
